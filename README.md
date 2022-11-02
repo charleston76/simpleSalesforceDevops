@@ -7,7 +7,7 @@ For bitbucket the things are almost the same, the only difference will be:
 
 For sure, the configuration part are not the same in both, but *understanding the idea explained here*, you can do it.
 
-Despite the activities done here are a little bit different of the one you can [check on trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics), some steps are very similar and that trail could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).
+Despite the activities done here are a little bit different of this one, you can [check on trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics), some steps are very similar and that trail could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).
 
 Well, we'll do deployments directly with pull request, passing by the following environments:
 1. Scratch orgs (CI);
@@ -18,7 +18,7 @@ Of course, instead of scratches and developer orgs, you'll be able to do the sam
 
 To use this guidance, we are expecting that you are comfortable with:
 * [Salesforce DX](https://trailhead.salesforce.com/content/learn/projects/quick-start-salesforce-dx);
-* [Salesforce CLI features](https://developer.salesforce.com/tools/sfdxcli), and;
+* [Salesforce CLI features](https://developer.salesforce.com/tools/sfdxcli);
 * [Scratch Orgs](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs.htm);
 * [Git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line);
 
@@ -32,7 +32,7 @@ In your workstation, you need to have at least the following softwares installed
     * GitLens;
     * Salesforce Extension Pack;
     * Salesforce CLI Integration;
-    * Salesforce Package.xml Generator Extension for VS Code (over again, we'll not use it here, but it will help you to know);
+    * Salesforce Package.xml Generator Extension for VS Code (we'll not use it here, but it will help you to know);
 
 ## Devhub setup
 
@@ -42,59 +42,61 @@ There you'll find how to setup and authorize scratch orgs, dev hub, etc...
 When you have the things configured, let's rock!
 
 ## 01 Create a connected APP
-To give access to the git, first of all you need create the connected app allowing the github perform some activities in your environment
 
+To give access to the github actions, first of all you need create the "connected app" allowing it perform some activities in your environment.
 
+**Spoiler alert**: You can configure there in your environment, or just deploy the one [we have created here](force-app/main/default/connectedApps/DX_Pipeline_Deployment_Authentication.connectedApp-meta.xml)!
+
+You will continue needing create certification file (server.crt), but we'll talk about it soon.
 
 It is a good practice create an user to do that, for example:
+
     GitHubSandbox 1 User - GitHubSandbox1@deployer.com
     GitHubSandbox 2 User - GitHubSandbox2@deployer.com
 
+If you already did the deployment adjusting and [using this file](force-app/main/default/connectedApps/DX_Pipeline_Deployment_Authentication.connectedApp-meta.xml), you can jump to the step [3 - Create Private Key and Digital Certificate](#3---create-private-key-and-digital-certificate), otherwise, follow the steps below:
+
+## 1 - Configure the connected app
+
 From Setup, enter App Manager in the Quick Find box, select App Manager and click on "New Connected App"
-    1 - Connected App Name: Git Hub Connected App
-    2 - API Name: CAM_GitHubConnectedApp (CAM stands for Connected App Manager)
-    2 - Enable OAuth Settings: Checked
-    4 - Callback URL: https://login.salesforce.com/services/oauth2/callback
-    5 - Selected OAuth Scopes:  Access and manage your data (api)
-                                Perform requests on your behalf at any time (refresh_token, offline_access)
-                                Provide access to your data via the Web (web)
-    6 - Require Secret for Web Server Flow: checked
-    7 - Save, then Continue.
+1. Connected App Name: DX Pipeline Deployment Authentication (or wherever you want)
+    1. API Name: CAM_GitHubConnectedApp (CAM stands for Connected App Manager)
+    1. Enable OAuth Settings: Checked
+    1. Callback URL: http://localhost:1717/OauthRedirect
+    1. Selected OAuth Scopes:  
+        1. Access and manage your data (api)
+        1. Perform requests on your behalf at any time (refresh_token, offline_access)
+        1. Provide access to your data via the Web (web)
+    1. Require Secret for Web Server Flow: checked
+    1. Save, then Continue.
+1. Take notes of yours "Consumer Key" (Client ID) and "Consumer Secret" (Client Secret)
 
-Get and save your "Consumer Key" and "Consumer Secret"
+## 2 - Install OpenSSL
 
+The steps below will work for windows user only, but for linux or mac, you just need adjust some steps.
 
-<!-- 
-
-# Destructive 
-    # The package need to be in the destructive folder
-    --sfdx force:mdapi:deploy -d destructive -g -w 10
-
-
-
-# DevOps CI/CD
-
-## 02 Install OpenSSL
-[Just for windows users]
-    01 - Download a version for your operating system from https://www.openssl.org/community/binaries.html. As of September 2019, the instructions assume the version openssl-1.1.1c-win64-mingw.zip from https://bintray.com/vszakats/generic/openssl is installed.
-    02 - Unzip the OpenSSL file.
-    03 - Add the absolute path to the unzipped OpenSSL folder to your Windows PATH environment variable.
-    03 - Open Control Panel then click System, Advanced System Settings, then Environment Variables.
-    04 - Select the PATH variable then click Edit.
-    02 - Add the absolute path to your OpenSSL folder to the front of the existing PATH value, separating the two values by a semi-colon ;
-    06 - Click OK then OK.
-    07 - Restart your command prompt to pick up the new PATH changes.
-    08 - Enter openssl in your Terminal (macOS) or Command Prompt (Windows) to confirm that OpenSSL has been installed. You see something like the following.
+1. If you don't have, Download a version for your operating system from https://www.openssl.org/community/binaries.html. 
+1. Unzip the OpenSSL file.
+1. Add the absolute path to the unzipped OpenSSL folder to your Windows PATH environment variable.
+1. Open Control Panel then click System, Advanced System Settings, then Environment Variables.
+1. Select the PATH variable then click Edit.
+1. Add the absolute path to your OpenSSL folder to the front of the existing PATH value, separating the two values by a semi-colon ;
+1. Click OK then OK.
+1. Restart your command prompt to pick up the new PATH changes.
+1. Enter openssl in your Terminal (macOS) or Command Prompt (Windows) to confirm that OpenSSL has been installed. You see something like the following.
         OpenSSL>
-    09 - Enter version and confirm OpenSSL version 1.1 was installed and your PATH environment variable was updated correctly.
-    10 Enter q to exit the OpenSSL prompt.
+1. Enter version and confirm OpenSSL version 1.1 was installed and your PATH environment variable was updated correctly.
+1. Enter q to exit the OpenSSL prompt.
 
-## 03 Create Private Key and Digital Certificate
-https://trailhead.salesforce.com/content/learn/projects/automate-cicd-with-gitlab/integrate-with-gitlab
-    01 - Create a Certificate folder (better do that outside of the repository, for security reasons);
-    02 - From within the Certificate folder, generate an RSA private key.
-        openssl genrsa -des3 -passout pass:SomePassword -out server.pass.key 4096
-    03 - Create a key file from the server.pass.key file. Use the same password from the prior command.
+## 3 - Create Private Key and Digital Certificate
+
+1. Create a Certificate folder (better do that outside of the repository, for security reasons);
+1. From within the Certificate folder, generate an RSA private key.
+    ```
+    openssl genrsa -des3 -passout pass:SomePassword -out server.pass.key 4096
+    ```
+
+1. Create a key file from the server.pass.key file. Use the same password from the prior command.
         openssl rsa -passin pass:SomePassword -in server.pass.key -out server.key
     04 - Delete the server.pass.key file. It's no longer needed.
         del server.pass.key
@@ -133,6 +135,16 @@ https://trailhead.salesforce.com/content/learn/projects/automate-cicd-with-gitla
                 b - mkdir DevOps
                 c - cd DevOps
                 d- copy ..\..\Certificates\server.key.enc .
+
+
+<!-- 
+
+# Destructive 
+    # The package need to be in the destructive folder
+    --sfdx force:mdapi:deploy -d destructive -g -w 10
+
+
+
 
 ## 04 Add Digital Certificate to Your Connected App
     1 - Open the connected App created before

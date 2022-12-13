@@ -1,4 +1,4 @@
-# Salesforce DevOps (CI/CD)
+# Simple Salesforce DevOps (CI/CD)
 
 This repository shows the necessary things to get workflows and actions running on github.
 For bitbucket the things are almost the same, the only difference will be:
@@ -7,20 +7,22 @@ For bitbucket the things are almost the same, the only difference will be:
 
 For sure, the configuration part are not the same in both, but *understanding the idea explained here*, you can do it.
 
-Despite the activities done here are a little bit different of this one, you can [check on thais trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics) some steps very similar that  could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).
+Despite the activities done here are a little bit different of this one, you can [check on this trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics) some steps very similar that  could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).
 
 Well, we'll do deployments directly with pull request, passing by the following environments:
 1. Scratch orgs (CI);
-1. Developer orgs (CD), and... 
+1. Developer orgs (UAT as CD), and... 
 1. Over again in developer org mimicking an production org.
 
 Of course, instead of scratches and developer orgs, you'll be able to do the same on sandboxes and production orgs, etc, and instead of work with just pull requests, you also can use pushes and etc.
+
+And for sure, you maybe have an QA environment, before arriving the UAT environment... Because you know, the life is not that easy.
 
 ## How the magic will happen?
 
 Well, we intend to keep the things simple here. 
 
-Due that, our example will follow a simple name convention strategy, and will deploy the things, based on pull requests "opening" and "closing" (after approval, or in the way you do in your works).
+Due that, our example will follow a simple name convention strategy, and will deploy the things, based on pull requests "opening" and "closing" (after approval, or in the way you do in your work).
 
 Step by step, it would be:
 1. You create your branch following your name convetion;
@@ -31,7 +33,7 @@ Step by step, it would be:
 1. After finish it, you create a pull request to move forward;
     1. That pull request will be validated against a scratch org (but could be whatever you want);
     1. If everything is fine, you can merge that pull request, that will finally deploy your things in your QA/UAT or wherever you want;
-1. After QA/UAT break your things, no sorry, I'm kidding. But sometimes, it happens... But let's think just in the happy path.
+1. After the testing team break your things (on QA/UAT), no sorry, I'm kidding. But sometimes, it happens... But let's think just in the happy path.
 1. Now you create new a pull request to move forward;
     1. That pull request will be validated against a scratch org (believe me, it will be needed and will work like a rehearsal strategy)
         * Being very honest, I really prefer create a sandbox based on productive environment, to really be a rehearsal, avoiding surprises;
@@ -60,6 +62,7 @@ In your workstation, you need to have at least the following softwares installed
 * Salesforce CLI
 * Salesforce [SFDX Commerce Plugin](https://github.com/forcedotcom/sfdx-1commerce-plugin)
 * Visual Studio Code with the pluggins below:
+    * GitLens;
     * Salesforce Extension Pack;
     * Salesforce CLI Integration;
     * Salesforce Package.xml Generator Extension for VS Code;
@@ -83,7 +86,7 @@ It is a good practice create an user to do that, for example:
     GitHubSandbox 1 User - GitHubSandbox1@deployer.com
     GitHubSandbox 2 User - GitHubSandbox2@deployer.com
 
-If you will [use this file](force-app/main/default/connectedApps/DX_Pipeline_Deployment_Authentication.connectedApp-meta.xml), you can jump to the step [2 - Install OpenSSL](#2---install-openssl), otherwise, follow the steps below:
+If you will [use this file](force-app/main/default/connectedApps/DX_Pipeline_Deployment_Authentication.connectedApp-meta.xml) (don't forget to change it according your needs), you can jump to the step [2 - Install OpenSSL](#2---install-openssl), otherwise, follow the steps below:
 
 ### 1 - Configure the connected app
 
@@ -156,7 +159,7 @@ If you already have this certificate, you can jump to the step [4 - Add the digi
         1. Enter the information needed
         1. Country Name (2 letter code)                BR
         1. State or Province Name (full name)          SP
-        1. Locality Name (eg, city)                    Barueri
+        1. Locality Name (eg, city)                    Your city name
         1. Organization Name (eg, company)             Your organization name
         1. Organizational Unit Name (eg, section)      Your organization unit name
         1. Common Name (eg, fully qualified host name) some.anything.com
@@ -167,7 +170,7 @@ If you already have this certificate, you can jump to the step [4 - Add the digi
     ```
     openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
     ```
-1. Encrypt the server.key file so that you can safely add it to your Git repository in the next step. For the -k argument, you can choose a different password other than SomePassword.
+1. Encrypt the server.key file so that you can safely add it to your Git repository in the next step. For the -k argument, you can choose a different password other than SomePassword (hehehe).
     ```
     openssl enc -aes-256-cbc -md sha256 -salt -e -in server.key -out server.key.enc -k SomePassword -pbkdf2
     ```
@@ -202,7 +205,8 @@ The next steps you will have to do with [Github actions](https://docs.github.com
 
 In your repository, create the files under **.github/workflows/** directory to store your workflow files.
 
-But here, we already have those.
+But here, we already have these ones:
+
 
 <!-- 
 

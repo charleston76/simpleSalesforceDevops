@@ -1,7 +1,7 @@
 name: Ci-Pull-Request-Check-Only
 on:
   pull_request:
-    types: [opened]
+    types: [opened, ready_for_review, reopened]
     branches: [develop]
 jobs:
   CiPullRequestCheckOnly:

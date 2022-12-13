@@ -177,12 +177,12 @@ If you already have this certificate, you can jump to the step [4 - Add the digi
     * server.key
     * server.key.enc
 
-        09 - Add Encrypted Key to Your Project
-            You can create a DevOps folder name (or which one do you want) and copy the encrypted files to it
-                a - Access you project folder
-                b - mkdir DevOps
-                c - cd DevOps
-                d- copy ..\..\Certificates\server.key.enc .
+1.  Add Encrypted Key to Your Project
+    * You can create a DevOps folder name (or which one do you want) and copy the encrypted files to it
+        * Access you project folder
+        * mkdir DevOps
+        * cd DevOps
+        * copy ..\..\Certificates\server.key.enc .
 
 ### 4 - Add the digital certificate to your Connected App
 1. Open the connected App created before.
@@ -195,6 +195,15 @@ Don't forget to notice that, as the message says: **Changes can take up to 10 mi
 
 ![App Manager](images/appManager.png)
 
+
+### 5 - Git Actions
+    
+The next steps you will have to do with [Github actions](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/introduction-to-github-actions)!
+
+In your repository, create the files under **.github/workflows/** directory to store your workflow files.
+
+But here, we already have those.
+
 <!-- 
 
 # Destructive 
@@ -204,13 +213,4 @@ Don't forget to notice that, as the message says: **Changes can take up to 10 mi
 
 ## 05 Check if the login was defined correctly
 Check Your Work
-
-## Actions
-    The next steps will have to do with Github actions
-        https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/introduction-to-github-actions
-    
-    In your repository, create the .github/workflows/ directory to store your workflow files.
-    In the .github/workflows/ directory, create a new file
-        feature-rm-onpush.yml 
-    and add the following code.
  -->

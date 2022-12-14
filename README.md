@@ -49,6 +49,36 @@ Of course that will really work if you have some [branch protection rules](https
 But its is something up to you, because actually all shown here need to be adequate to follow your needs.
 
 
+## How to achieve the apex classes coverage?
+
+No miracles here my friend, everybody knows that coverage is not necessary to deploy in non-productive organizations, but believe me, is better be preperad to that, than pass by all the environments and let to discover some deployment issues just in the "go live" (whos never?).
+
+![Coverage Issue](images/coverageIssue.png)
+
+In this example we are expecting that your apex classes also follows the name convention below:
+* ApexClasName
+* ApexClasNameTest
+
+With this name convention, behind the scenes we have a [node.js file](/scripts/js/readApexTestClass.js) that will read the package looking for apex classes, and for each ones found will:
+1. Get its names;
+1. Concatenate with "Test";
+1. Confirms if exist a test class with that name;
+1. Adds the existing ones in the deployment command;
+
+Examples in the repository:
+* AccountController;
+* AccountHelper;
+* AccountControllerTest (that will coverage both of them);
+
+In the ideal scenario on the perfect world, all classes will get 100% of coverage with your hard work!
+
+Yep, I know, but not today...
+
+![Coverage done](images/coveredDone.png)
+
+
+We also have another way to do that, using a "test specification file", and as the name says, you specify what test classes would run to achieve the coverage, but we'll talk about that in a future version...
+
 ## First things first: Local environment
 
 To use this guidance, we are expecting that you are comfortable with:
@@ -205,8 +235,30 @@ The next steps you will have to do with [Github actions](https://docs.github.com
 
 In your repository, create the files under **.github/workflows/** directory to store your workflow files.
 
-But here, we already have these ones:
+Here, we already have these workflow **yml** example files, that follows an known pattern used in to perform the actions:
 
+![Git actions](images/gitActions.png)
+
+In a nutshell, a yml file is a text document that contains data formatted using YAML (YAML Ain't Markup Language), a human-readable data format used for data serialization. It is used for reading and writing data independent of a specific programming language. Because YAML syntax is language-agnostic, YML files can be incorporated into programs written in most popular programming languages, including C/C++, Ruby, Python, Java, Perl, C#, PHP, and others...
+
+![YML file](images/gitYmlFile.png)
+
+You can found more about that in the [Github actions](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/introduction-to-github-actions) article, because here, as I've told before, we want to keep the things simple.
+
+In the action files you will read environment variables (Settings > Secrets > Actions), that will allow you access the environments
+
+![Git Secrets](images/gitSecrets.png)
+
+* _USER_ADMIN - The username that you'll use to do the deployments;
+* _CONSUMER_KEY - That [you have configured](#1---configure-the-connected-app);
+* _INSTANCE_URL - The environment URL instance;
+    * Yes, I know you can do it with the generic ones, like login.salesforce.com or test.salesforce.com, but sometimes, the salesforce side refuse the git connections through those, mainly in sandboxes...
+    * Due that, I recommend you use the specific one related with your environment;
+
+
+## Coming soon...
+
+In the next versions, we'll apply some destructive changes (pre and post deployment) in this actions, stay tuned!
 
 <!-- 
 

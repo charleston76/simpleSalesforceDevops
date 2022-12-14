@@ -48,7 +48,8 @@ Step by step, it would be:
         * But over again, let's talk about just of the happy path!
     1. If everything is fine, you can merge that pull request, that will finally deploy your things in your PRODUCTIVE environment;
 
-<img src="images/ReleaseManagementStrategy-GeneralGitAction.png" data-canonical-src="images/ReleaseManagementStrategy-GeneralGitAction.png" width="50%" height="50%" />
+<!-- <img src="images/ReleaseManagementStrategy-GeneralGitAction.png" data-canonical-src="images/ReleaseManagementStrategy-GeneralGitAction.png" width="50%" height="50%" /> -->
+![Release Management Strategy](images/ReleaseManagementStrategy-GeneralGitAction.png)
 
 Of course that will really work if you have some [branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule) in place, to require approvals, get evidences and etc.
 
@@ -84,6 +85,12 @@ Yep, I know, but not today...
 
 
 We also have another way to do that, using a "test specification file", and as the name says, you specify what test classes would run to achieve the coverage, but we'll talk about that in a future version...
+
+## Don't have apex classes involved?
+
+Easy peasy lemon squeezy!
+
+Just create the package without any of that!
 
 ## First things first: Local environment
 

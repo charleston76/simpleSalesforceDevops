@@ -91,4 +91,4 @@ jobs:
         if: github.event.pull_request.merged == false
         run: |
           echo "Doing the validation in the environment"
-          sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }} -u DeploymetOrg
+          sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}

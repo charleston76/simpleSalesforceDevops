@@ -10,11 +10,11 @@ For sure, the configuration part are not the same in both, but *understanding th
 Despite the activities done here are a little bit different of this one, you can [check on this trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics) some steps very similar that  could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).
 
 Well, we'll do deployments directly with pull request, passing by the following environments:
-1. Scratch orgs (CI);
+1. Developer orgs (CI);
 1. Developer orgs (UAT as CD), and... 
 1. Over again in developer org mimicking an production org.
 
-Of course, instead of scratches and developer orgs, you'll be able to do the same on sandboxes and production orgs, etc, and instead of work with just pull requests, you also can use pushes and etc.
+Of course, instead of developer orgs, you'll be able to do the same on sandboxes and production orgs. And also instead of work with just pull requests, you also can use pushes and etc.
 
 And for sure, you maybe have an QA environment, before arriving the UAT environment... Because you know, the life is not that easy.
 
@@ -31,11 +31,11 @@ Step by step, it would be:
     1. Example: DEV-012;
 1. You do your development in your environment (scratch, sandbox or developer organization);
 1. After finish it, you create a pull request to move forward;
-    1. That pull request will be validated against a scratch org (but could be whatever you want);
+    1. That pull request will be validated against the org before deploying;
     1. If everything is fine, you can merge that pull request, that will finally deploy your things in your QA/UAT or wherever you want;
 1. After the testing team break your things (on QA/UAT), no sorry, I'm kidding. But sometimes, it happens... But let's think just in the happy path.
 1. Now you create new a pull request to move forward;
-    1. That pull request will be validated against a scratch org (believe me, it will be needed and will work like a rehearsal strategy)
+    1. That pull request will be validated against the org (believe me, it will be needed and will work like a rehearsal strategy)
         * Being very honest, I really prefer create a sandbox based on productive environment, to really be a rehearsal, avoiding surprises;
         * Why? Well, sometimes we have different teams doing different things and moving stuffs to production, and those stuffs could break ours;
         * Other times we have some special users or support teams doing things directly to production, and the list goes on...
@@ -84,7 +84,6 @@ We also have another way to do that, using a "test specification file", and as t
 To use this guidance, we are expecting that you are comfortable with:
 * [Salesforce DX](https://trailhead.salesforce.com/content/learn/projects/quick-start-salesforce-dx);
 * [Salesforce CLI features](https://developer.salesforce.com/tools/sfdxcli);
-* [Scratch Orgs](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs.htm);
 * [Git CLI](https://git-scm.com/book/en/v2/Getting-Started-The-Command-Line);
 
 In your workstation, you need to have at least the following softwares installed:
@@ -97,11 +96,13 @@ In your workstation, you need to have at least the following softwares installed
     * Salesforce CLI Integration;
     * Salesforce Package.xml Generator Extension for VS Code;
 
-## Devhub setup
+## Deploying with pull requests
 
-For sake of time and avoiding be redundant, please take a look on the [Setup section of this other repository](https://github.com/charleston76/b2bSimpleTemplate/blob/main/README.md), there you'll find out how to setup and authorize scratch orgs, devhub, etc...
+Here the deployments will be done with pull requests, following the steps below:
 
-When you have the things configured, let's rock!
+1. PR creation triggers a validation;
+1. PR merging triggers the final deployment;
+1. PR closing without merge do nothing;
 
 ## Deployment Setup
 

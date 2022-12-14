@@ -5,6 +5,10 @@ For bitbucket the things are almost the same, the only difference will be:
 * Github calls it as **actions**;
 * Bitbuckt calls it as **workflows**;
 
+Please, take a look on the **video demos** we have in the channel (better in playback speed 1.5)!
+
+[![Execution example](images/santosforceChannel.png)](https://www.youtube.com/@santosforce6170)
+
 For sure, the configuration part are not the same in both, but *understanding the idea explained here*, you can do it.
 
 Despite the activities done here are a little bit different of this one, you can [check on this trailhead](https://trailhead.salesforce.com/content/learn/modules/git-and-git-hub-basics) some steps very similar that  could be a good starting point, since the real one I was looking for (related with CI/CD), is not available anymore (at least, I have not found).

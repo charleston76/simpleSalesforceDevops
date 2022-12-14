@@ -79,7 +79,7 @@ jobs:
           PROD_CONSUMER_KEY: ${{ secrets.PROD_CONSUMER_KEY }}
           PROD_INSTANCE_URL: ${{ secrets.PROD_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
-        run: 
+        run: |
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
           sfdx auth:jwt:grant -i $PROD_CONSUMER_KEY -f JWT/connectionFile -u $PROD_USER_ADMIN -s -r $PROD_INSTANCE_URL -a DeploymetOrg
           rm -rf JWT
@@ -91,4 +91,4 @@ jobs:
         if: github.event.pull_request.merged == true
         run: |
           echo "Doing the real deployment in the environment"
-          sfdx force:mdapi:deploy -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }} -u DeploymetOrg
+          sfdx force:mdapi:deploy -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}

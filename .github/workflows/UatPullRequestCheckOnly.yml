@@ -79,7 +79,7 @@ jobs:
           UAT_CONSUMER_KEY: ${{ secrets.UAT_CONSUMER_KEY }}
           UAT_SANDBOX_INSTANCE_URL: ${{ secrets.UAT_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
-        run: 
+        run: |
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
           sfdx auth:jwt:grant -i $UAT_CONSUMER_KEY -f JWT/connectionFile -u $UAT_USER_ADMIN -s -r $UAT_SANDBOX_INSTANCE_URL -a DeploymetOrg
           rm -rf JWT
@@ -91,4 +91,4 @@ jobs:
         if: github.event.pull_request.merged == false
         run: |
           echo "Doing the validation in the environment"
-          sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }} -u DeploymetOrg
+          sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}

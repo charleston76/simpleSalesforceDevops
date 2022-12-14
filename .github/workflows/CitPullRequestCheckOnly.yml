@@ -80,7 +80,9 @@ jobs:
           CI_SANDBOX_INSTANCE_URL: ${{ secrets.CI_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: 
-          sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f "$SERVER_KEY_CERTIFICATE" -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
+          echo $SERVER_KEY_CERTIFICATE > JWT/connectionFile
+          sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f JWT/connectionFile -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
+          rm -rf JWT
       - name: Removing existing older folder
         run: rm -rf Deploy
       - name: Converting the package

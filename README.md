@@ -223,6 +223,8 @@ If you already have this certificate, you can jump to the step [4 - Add the digi
         * mkdir DevOps
         * cd DevOps
         * copy ..\..\Certificates\server.key.enc .
+        * Save the server.key content file in the SERVER_KEY_CERTIFICATE environment varialbe in githug (Settings > Secrets > Actions)
+        ![Server Key](images/gitCertificate.png)
 
 ### 4 - Add the digital certificate to your Connected App
 1. Open the connected App created before.

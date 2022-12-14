@@ -28,8 +28,14 @@ Step by step, it would be:
 1. You create your branch following your name convetion;
     1. Let's supposed that you use "ticket numbers" created on jira, service now or wherever;
     1. The ticket to developments have the "DEV-" prefix and the number;
-    1. Example: DEV-012;
+    1. Examples to the name DEV-012:
+    1. feature/DEV-012;
+    1. bugfix/DEV-012;
 1. You do your development in your environment (scratch, sandbox or developer organization);
+1. You create a package file in the manifest folder, following the same name convetion, with **package-BRANCH__NAME.xml**;
+    * That branch name DEV-012, would have the file **package-DEV-012.xml**;
+    
+    ![Package Name](images/packageName.png)
 1. After finish it, you create a pull request to move forward;
     1. That pull request will be validated against the org before deploying;
     1. If everything is fine, you can merge that pull request, that will finally deploy your things in your QA/UAT or wherever you want;

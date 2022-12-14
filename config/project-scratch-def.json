@@ -1,0 +1,39 @@
+{
+  "orgName": "DevOps Company",
+  "edition": "Developer",
+  "country": "US",  
+  "features": [ 
+      "MultiCurrency",
+      "Communities", 
+      "B2BCommerce", 
+      "OrderManagement", 
+      "EnableSetPasswordInApi"
+  ],
+  "settings": {
+      "lightningExperienceSettings": {
+          "enableS1DesktopEnabled": true
+      },
+      "experienceBundleSettings": {
+          "enableExperienceBundleMetadata": true
+      },
+      "communitiesSettings": {
+          "enableNetworksEnabled": true,
+          "enableOotbProfExtUserOpsEnable": true
+      },
+      "orderManagementSettings": {
+          "enableOrderManagement": true
+      },
+      "orderSettings": {
+          "enableOrders": true,
+          "enableEnhancedCommerceOrders": true,
+          "enableOptionalPricebook": true,
+          "enableNegativeQuantity" : false,
+          "enableOrderEvents" : false,
+          "enableReductionOrders" : true,
+          "enableZeroQuantity" : false
+      },
+      "commerceSettings": {
+        "commerceEnabled": true
+      }
+  }
+}

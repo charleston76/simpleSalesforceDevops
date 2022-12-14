@@ -78,8 +78,9 @@ jobs:
           CI_USER_ADMIN: ${{ secrets.CI_USER_ADMIN }}
           CI_CONSUMER_KEY: ${{ secrets.CI_CONSUMER_KEY }}
           CI_SANDBOX_INSTANCE_URL: ${{ secrets.CI_SANDBOX_INSTANCE_URL }}
+          SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: 
-          sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f JWT/server.key -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
+          sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f $SERVER_KEY_CERTIFICATE -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
       - name: Removing existing older folder
         run: rm -rf Deploy
       - name: Converting the package

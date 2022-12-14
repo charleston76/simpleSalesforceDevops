@@ -79,7 +79,7 @@ jobs:
           PRODUCTIVE_CONSUMER_KEY: ${{ secrets.PRODUCTIVE_CONSUMER_KEY }}
           PRODUCTIVE_INSTANCE_URL: ${{ secrets.PRODUCTIVE_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
-        run: 
+        run: |
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
           sfdx auth:jwt:grant -i $PRODUCTIVE_CONSUMER_KEY -f JWT/connectionFile -u $PRODUCTIVE_USER_ADMIN -s -r $PRODUCTIVE_INSTANCE_URL -a DeploymetOrg
           rm -rf JWT

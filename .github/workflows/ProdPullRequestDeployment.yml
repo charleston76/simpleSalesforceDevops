@@ -78,8 +78,11 @@ jobs:
           PROD_USER_ADMIN: ${{ secrets.PROD_USER_ADMIN }}
           PROD_CONSUMER_KEY: ${{ secrets.PROD_CONSUMER_KEY }}
           PROD_INSTANCE_URL: ${{ secrets.PROD_INSTANCE_URL }}
+          SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: 
-          sfdx auth:jwt:grant -i $PROD_CONSUMER_KEY -f JWT/server.key -u $PROD_USER_ADMIN -s -r $PROD_INSTANCE_URL -a DeploymetOrg
+          echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
+          sfdx auth:jwt:grant -i $PROD_CONSUMER_KEY -f JWT/connectionFile -u $PROD_USER_ADMIN -s -r $PROD_INSTANCE_URL -a DeploymetOrg
+          rm -rf JWT
       - name: Removing existing older folder
         run: rm -rf Deploy
       - name: Converting the package

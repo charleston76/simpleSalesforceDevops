@@ -79,9 +79,14 @@ jobs:
           CI_CONSUMER_KEY: ${{ secrets.CI_CONSUMER_KEY }}
           CI_SANDBOX_INSTANCE_URL: ${{ secrets.CI_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
+      - name: Reading the certification
         run: 
           echo $SERVER_KEY_CERTIFICATE > JWT/connectionFile
+      - name: Accessing
+        run: 
           sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f JWT/connectionFile -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
+      - name: Removing the certification
+        run: 
           rm -rf JWT
       - name: Removing existing older folder
         run: rm -rf Deploy

@@ -1,0 +1,91 @@
+name: Ci-Pull-Request-Check-Only
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+    branches: [develop]
+jobs:
+  CiPullRequestCheckOnly:
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - name: Checking the branch and the package file
+        run: |
+          fullName=${{github.head_ref}}
+          echo "Full branch name ${fullName}"
+          feature="feature"
+          release="release"
+          bugfix="bugfix"
+          hotfix="hotfix"
+          if [[ "$fullName" == *"$feature"* ]]
+          then
+            subString="$feature"
+          elif [[ "$fullName" == *"$release"* ]]
+          then
+            subString="$release"
+          elif [[ "$fullName" == *"$bugfix"* ]]
+          then
+            subString="$bugfix"
+          else
+            subString="$hotfix"
+          fi
+          subString="$subString/"
+          echo "subString $subString"
+          reducedName=$(echo $fullName | grep -o "$subString.*")
+          echo "Reduced name" $reducedName
+          finalBranchName=$(echo $reducedName | grep -o "/.*")
+          finalBranchName=${finalBranchName:1}
+          echo "Final branch name" $finalBranchName
+
+          packageFileName="manifest/package-$finalBranchName.xml"
+          echo "package File Name $packageFileName"
+          echo "Checking if the package exists"
+          if [[ -f $packageFileName  ]]; then
+            echo "The package file exist, continuing the process!"
+          else
+            echo "The package file does not exist, the process will fail!"
+          fi
+
+          echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
+      - name: Install sfdx CLI
+        run: npm install sfdx-cli --global
+      - name: Check CLI the version
+        run: sfdx -v
+      - name: Installing xml2js
+        run: npm install xml2js
+      - name: Reading package test classes
+        run: |
+          SFDX_SPECIFIC_TEST_FOUND=$(node ./scripts/js/readApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}");
+          echo "SFDX_SPECIFIC_TEST_FOUND=$SFDX_SPECIFIC_TEST_FOUND" >> $GITHUB_ENV;
+      - name: Defining the test command
+        run: |
+          if [ -z "${{ env.SFDX_SPECIFIC_TEST_FOUND }}" ]
+          then
+            echo "There is no test classes"
+            SFDX_RUN_TEST_LEVEL="-l NoTestRun"
+          else
+            SFDX_RUN_TEST_LEVEL="-l RunSpecifiedTests -r ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
+          fi
+          echo "SFDX_RUN_TEST_LEVEL=$SFDX_RUN_TEST_LEVEL" >> $GITHUB_ENV;
+      - name: Printing specific test classes found
+        run: |
+          echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
+      - name: Login in the environment
+        env:
+          CI_USER_ADMIN: ${{ secrets.CI_USER_ADMIN }}
+          CI_CONSUMER_KEY: ${{ secrets.CI_CONSUMER_KEY }}
+          CI_SANDBOX_INSTANCE_URL: ${{ secrets.CI_SANDBOX_INSTANCE_URL }}
+        run: 
+          sfdx auth:jwt:grant -i $CI_CONSUMER_KEY -f JWT/server.key -u $CI_USER_ADMIN -s -r $CI_SANDBOX_INSTANCE_URL -a DeploymetOrg
+      - name: Removing existing older folder
+        run: rm -rf Deploy
+      - name: Converting the package
+        run: sfdx force:source:convert -r force-app/ -d Deploy -x "${{ env.PACKAGE_FILE_NAME }}"
+      - name: Running the validation
+        if: github.event.pull_request.merged == false
+        run: |
+          echo "Doing the validation in the environment"
+          sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}

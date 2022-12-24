@@ -59,7 +59,7 @@ But its is something up to you, because actually all shown here need to be adequ
 <br/>
 
 <!-- ![Destructive changes](images/destructiveFinal3.png) -->
-<img src="images/destructiveFinal3.png" width="20%" height="20%" alt="Destructive changes" />
+<img src="images/destructiveFinal3.png" width="30%" height="30%" alt="Destructive changes" />
 
 The destructive process just follow the same strategy created before: “Naming convention“.
 

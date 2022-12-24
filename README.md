@@ -56,9 +56,10 @@ Of course that will really work if you have some [branch protection rules](https
 But its is something up to you, because actually all shown here need to be adequate to follow your needs.
 <br/><br/>
 ## Destructive changes? Yes, we do that here!
-<br/><br/>
+<br/>
 
-![Destructive changes](images/destructiveFinal3.png)
+<!-- ![Destructive changes](images/destructiveFinal3.png) -->
+<img src="images/destructiveFinal3.png" width="20%" height="20%" alt="Destructive changes" />
 
 The destructive process just follow the same strategy created before: “Naming convention“.
 
@@ -78,7 +79,7 @@ This will be the deployment order, case one or both files exists:
 Very simple, and behind the scenes, the git action just will do the sfdx commands below:
 
     ```
-    sfdx force:mdapi:deploy -u GJPDev -d destructive -g -w -1
+    sfdx force:mdapi:deploy -u [ORG_ALIAS] -d manifestDestructive -g -w -1
     ```
 
 

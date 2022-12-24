@@ -47,8 +47,29 @@ jobs:
             echo "The package file exist, continuing the process!"
           else
             echo "The package file does not exist, the process will fail!"
+            exit 1
           fi
 
+          echo "Check if exists any destructive change to run"
+          destructivePreName="manifestDestructive/packagePre-$finalBranchName.xml"
+          destructivePosName="manifestDestructive/packagePos-$finalBranchName.xml"
+
+          if [[ -f $destructivePreName ]]; then
+            echo "Destructive Pre File Name found $destructivePreName"
+            DESTRUCTIVE_PRE_DEPLOY=$destructivePreName
+          else
+            DESTRUCTIVE_PRE_DEPLOY=""
+          fi
+
+          if [[ -f $destructivePosName ]]; then
+            echo "Destructive Pos File Name found $destructivePosName"
+            DESTRUCTIVE_POS_DEPLOY=$destructivePosName
+          else
+            DESTRUCTIVE_POS_DEPLOY=""
+          fi
+
+          echo "DESTRUCTIVE_PRE_DEPLOY=$DESTRUCTIVE_PRE_DEPLOY" >> $GITHUB_ENV;
+          echo "DESTRUCTIVE_POS_DEPLOY=$DESTRUCTIVE_POS_DEPLOY" >> $GITHUB_ENV;
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
       - name: Install sfdx CLI
         run: npm install sfdx-cli --global
@@ -83,6 +104,18 @@ jobs:
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
           sfdx auth:jwt:grant -i $UAT_CONSUMER_KEY -f JWT/connectionFile -u $UAT_USER_ADMIN -s -r $UAT_SANDBOX_INSTANCE_URL -a DeploymetOrg
           rm -rf JWT
+      - name: Destructive Pre deployment steps
+        run: |
+          if [[ -z "${{ env.DESTRUCTIVE_PRE_DEPLOY }}" ]]; then
+            echo "No destructive pre deployment steps defined!"
+          else
+            echo "Doing the destructive pre deployment for real"
+            rm -rf Deploy
+            mkdir Deploy
+            cp manifestDestructive/package.xml Deploy/package.xml 
+            cp "${{ env.DESTRUCTIVE_PRE_DEPLOY }}" Deploy/destructiveChanges.xml
+            sfdx force:mdapi:deploy -u DeploymetOrg -d Deploy -g -w -1
+          fi
       - name: Removing existing older folder
         run: rm -rf Deploy
       - name: Converting the package
@@ -92,3 +125,15 @@ jobs:
         run: |
           echo "Doing the validation in the environment"
           sfdx force:mdapi:deploy -c -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}
+      - name: Destructive Post deployment steps
+        run: |
+          if [[ -z "${{ env.DESTRUCTIVE_POS_DEPLOY }}" ]]; then
+            echo "No destructive pos deployment steps defined!"
+          else
+            echo "Doing the destructive post deployment for real"
+            rm -rf Deploy
+            mkdir Deploy
+            cp manifestDestructive/package.xml Deploy/package.xml 
+            cp "${{ env.DESTRUCTIVE_POS_DEPLOY }}" Deploy/destructiveChanges.xml
+            sfdx force:mdapi:deploy -u DeploymetOrg -d Deploy -g -w -1
+          fi

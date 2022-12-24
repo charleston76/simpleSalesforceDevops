@@ -6,5 +6,9 @@
 		<members>AccountHelper</members>
 		<name>ApexClass</name>
 	</types>
+	<types>
+		<members>Account.ContactNewCustomer__c</members>
+		<name>CustomField</name>
+	</types>
 	<version>55.0</version>
 </Package>

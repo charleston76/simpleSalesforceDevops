@@ -7,7 +7,7 @@ public with sharing class AccountHelper {
         
         try {
             lstReturn  = [
-                SELECT Id, Name FROM Account WHERE Id IN: accountIds
+                SELECT Id, Name, CreatedDate , ContactNewCustomer__c FROM Account WHERE Id IN: accountIds
             ];
             
         } catch (Exception objEx) {

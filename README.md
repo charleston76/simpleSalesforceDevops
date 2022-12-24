@@ -54,6 +54,33 @@ Step by step, it would be:
 Of course that will really work if you have some [branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule) in place, to require approvals, get evidences and etc.
 
 But its is something up to you, because actually all shown here need to be adequate to follow your needs.
+<br/><br/>
+## Destructive changes? Yes, we do that here!
+<br/>
+
+<!-- ![Destructive changes](images/destructiveFinal3.png) -->
+<img src="images/destructiveFinal3.png" width="30%" height="30%" alt="Destructive changes" />
+
+The destructive process just follow the same strategy created before: “Naming convention“.
+
+Based on the [Salesforce documentation](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy_deleting_files.htm) about destructive changes, the git action will follow the naming convention and will check if in the "manifestDestructive" folder exists the following files:
+* packagePre-BRANCH_NAME.xml
+* packagePos-BRANCH_NAME.xml
+
+![Destructive folder](images/destructiveFolder.png)
+
+You don't need matter about "package.xml" file, just leave that there...
+
+This will be the deployment order, case one or both files exists:
+1. packagePre-BRANCH_NAME.xml - Removing the needed things before the deployment;
+1. package-BRANCH_NAME.xml - Deploying and validating the apex classes;
+1. packagePos-BRANCH_NAME.xml - Removing the things after the deployment;
+
+Very simple, and behind the scenes, the git action just will do the sfdx commands below:
+
+    ```
+    sfdx force:mdapi:deploy -u [ORG_ALIAS] -d manifestDestructive -g -w -1
+    ```
 
 
 ## How to achieve the apex classes coverage?
@@ -274,7 +301,9 @@ In the action files you will read environment variables (Settings > Secrets > Ac
 
 ## Coming soon...
 
-In the next versions, we'll apply some destructive changes (pre and post deployment) in this actions, stay tuned!
+In the next versions, we'll show how to use that "test definition file", to achive the coverage.
+
+**Stay tuned!**
 
 <!-- 
 

@@ -1,9 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 const xml2js = require('xml2js');
+var classesPath = [];
 
 async function getApexTestClass(manifestpath){
-    var  classesPath = [];
     
     // Start with the firt class folder
     fillClassPath('force-app/main/default/classes');
@@ -77,7 +77,7 @@ async function fillClassPath(firtDir){
         }
     }
     await walkFolders(firtDir);
-    console.log('classesPath ' + JSON.stringify(classesPath) );
+    // console.log('classesPath ' + JSON.stringify(classesPath) );
 }
 
 //module.exports.SPECIFIC_TEST_FOUND = getApexTestClass();

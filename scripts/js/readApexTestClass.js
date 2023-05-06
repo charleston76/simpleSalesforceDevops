@@ -7,7 +7,7 @@ async function getApexTestClass(manifestpath){
     
     // Start with the firt class folder
     fillClassPath('force-app/main/default/classes');
-    console.log('classesPath ' + JSON.stringify(classesPath) );
+    // console.log('classesPath ' + JSON.stringify(classesPath) );
 
     var parser = new xml2js.Parser();
     var typeTmp = null;

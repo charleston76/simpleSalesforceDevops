@@ -50,7 +50,6 @@ async function getApexTestClass(manifestpath){
 }
 
 function checkPathApexTestClass(classesPath, classNameTmp){
-    // var classesPath = 'force-app/main/default/classes';
     let fileContentTmp = null;
 
     try{
@@ -77,10 +76,8 @@ async function fillClassPath(firtDir){
         }
     }
     await walkFolders(firtDir);
-    // console.log('classesPath ' + JSON.stringify(classesPath) );
 }
 
-//module.exports.SPECIFIC_TEST_FOUND = getApexTestClass();
 const args = process.argv.slice(2);
 var manifestpath = args[0];
 getApexTestClass(manifestpath).then((SFDX_SPECIFIC_TEST_FOUND) => {

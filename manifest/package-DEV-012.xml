@@ -4,6 +4,7 @@
 		<members>AccountController</members>
 		<members>AccountControllerTest</members>
 		<members>AccountHelper</members>
+		<members>AccountHelperTest</members>
 		<name>ApexClass</name>
 	</types>
 	<types>

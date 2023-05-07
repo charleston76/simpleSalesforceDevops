@@ -76,9 +76,9 @@ Based on the [Salesforce documentation](https://developer.salesforce.com/docs/at
 You don't need matter about "package.xml" file, just leave that there...
 
 This will be the deployment order, case one or both files exists:
-1. packagePre-BRANCH_NAME.xml - Removing the needed things before the deployment;
-1. package-BRANCH_NAME.xml - Deploying and validating the apex classes;
-1. packagePos-BRANCH_NAME.xml - Removing the things after the deployment;
+1. manifestDestructive/packagePre-BRANCH_NAME.xml - Removing the needed things before the deployment;
+1. manifest/package-BRANCH_NAME.xml - Deploying and validating the apex classes;
+1. manifestDestructive/packagePos-BRANCH_NAME.xml - Removing the things after the deployment;
 
 Very simple, and behind the scenes, the git action just will do the sfdx commands below:
 

@@ -104,7 +104,7 @@ jobs:
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: |
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
-          sf org login jwt --client-id $CONSUMER_KEY --jwt-key-file JWT/server.key --username $DEPLOYMENT_USER --set-default --instance-url $INSTANCE_URL --alias DeploymetOrg
+          sf org login jwt --client-id $CONSUMER_KEY --jwt-key-file /JWT/connectionFile --username $DEPLOYMENT_USER --set-default --instance-url $INSTANCE_URL --alias DeploymetOrg
           rm -rf JWT
       - name: Deploying the package file
         if: github.event.pull_request.merged == true

@@ -46,7 +46,7 @@ async function getApexTestClass(manifestpath){
         }
     }
     
-    return testClasses.join(",");
+    return testClasses.join(" ");
 }
 
 function checkPathApexTestClass(classesPath, classNameTmp){

@@ -47,13 +47,36 @@ jobs:
             echo "The package file exist, continuing the process!"
           else
             echo "The package file does not exist, the process will fail!"
+            exit 1
           fi
 
+          echo "Check if exists any destructive change to run"
+          destructivePreName="manifestDestructive/packagePre-$finalBranchName.xml"
+          destructivePosName="manifestDestructive/packagePos-$finalBranchName.xml"
+
+          if [[ -f $destructivePreName ]]; then
+            echo "Destructive Pre File Name found $destructivePreName"
+            DESTRUCTIVE_PRE_DEPLOY=$destructivePreName
+          else
+            DESTRUCTIVE_PRE_DEPLOY=""
+          fi
+
+          if [[ -f $destructivePosName ]]; then
+            echo "Destructive Pos File Name found $destructivePosName"
+            DESTRUCTIVE_POS_DEPLOY=$destructivePosName
+          else
+            DESTRUCTIVE_POS_DEPLOY=""
+          fi
+
+          echo "DESTRUCTIVE_PRE_DEPLOY=$DESTRUCTIVE_PRE_DEPLOY" >> $GITHUB_ENV;
+          echo "DESTRUCTIVE_POS_DEPLOY=$DESTRUCTIVE_POS_DEPLOY" >> $GITHUB_ENV;
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
       - name: Install sfdx CLI
-        run: npm install sfdx-cli --global
-      - name: Check CLI the version
-        run: sfdx -v
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
+          mkdir sfdx
+          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
+          echo "sfdx/bin" >> $GITHUB_PATH
       - name: Installing xml2js
         run: npm install xml2js
       - name: Reading package test classes
@@ -67,7 +90,7 @@ jobs:
             echo "There is no test classes"
             SFDX_RUN_TEST_LEVEL="-l NoTestRun"
           else
-            SFDX_RUN_TEST_LEVEL="-l RunSpecifiedTests -r ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
+            SFDX_RUN_TEST_LEVEL="-l RunSpecifiedTests -t ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
           fi
           echo "SFDX_RUN_TEST_LEVEL=$SFDX_RUN_TEST_LEVEL" >> $GITHUB_ENV;
       - name: Printing specific test classes found
@@ -75,20 +98,44 @@ jobs:
           echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
       - name: Login in the environment
         env:
-          UAT_USER_ADMIN: ${{ secrets.UAT_USER_ADMIN }}
-          UAT_CONSUMER_KEY: ${{ secrets.UAT_CONSUMER_KEY }}
-          UAT_SANDBOX_INSTANCE_URL: ${{ secrets.UAT_SANDBOX_INSTANCE_URL }}
+          DEPLOYMENT_USER: ${{ secrets.UAT_USER_ADMIN }}
+          CONSUMER_KEY: ${{ secrets.UAT_CONSUMER_KEY }}
+          INSTANCE_URL: ${{ secrets.UAT_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: |
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
-          sfdx auth:jwt:grant -i $UAT_CONSUMER_KEY -f JWT/connectionFile -u $UAT_USER_ADMIN -s -r $UAT_SANDBOX_INSTANCE_URL -a DeploymetOrg
+          sf org login jwt --client-id $CONSUMER_KEY --jwt-key-file JWT/connectionFile --username $DEPLOYMENT_USER --set-default --instance-url $INSTANCE_URL --alias DeploymetOrg
           rm -rf JWT
-      - name: Removing existing older folder
-        run: rm -rf Deploy
-      - name: Converting the package
-        run: sfdx force:source:convert -r force-app/ -d Deploy -x "${{ env.PACKAGE_FILE_NAME }}"
       - name: Deploying the package file
         if: github.event.pull_request.merged == true
         run: |
           echo "Doing the real deployment in the environment"
-          sfdx force:mdapi:deploy -d Deploy/ -w -1 ${{ env.SFDX_RUN_TEST_LEVEL }}
+          echo "Check CLI the version"
+          sf -v
+
+          rm -rf Deploy
+          mkdir Deploy
+
+          if [[ -z "${{ env.DESTRUCTIVE_PRE_DEPLOY }}" ]]; then
+            echo "No destructive pre deployment steps defined!"
+          else
+            echo "Creating the destructive pre deployment for real"
+            destructivePreFileName="Deploy/destructiveChangesPre.xml"
+            cp "${{ env.DESTRUCTIVE_PRE_DEPLOY }}" "$destructivePreFileName"
+
+            FINAL_DESTRUCTIVE_PRE_DEPLOY="--pre-destructive-changes $destructivePreFileName"
+          fi
+          echo "FINAL_DESTRUCTIVE_PRE_DEPLOY = $FINAL_DESTRUCTIVE_PRE_DEPLOY"
+
+          if [[ -z "${{ env.DESTRUCTIVE_POS_DEPLOY }}" ]]; then
+            echo "No destructive pos deployment steps defined!"
+          else
+            echo "Creating the destructive post deployment for real"
+
+            destructivePosFileName="Deploy/destructiveChangesPost.xml"
+            cp "${{ env.DESTRUCTIVE_POS_DEPLOY }}" "$destructivePosFileName"
+            FINAL_DESTRUCTIVE_POS_DEPLOY="--pre-destructive-changes $destructivePosFileName"
+          fi
+          echo "FINAL_DESTRUCTIVE_POS_DEPLOY = $FINAL_DESTRUCTIVE_POS_DEPLOY"
+
+          sf project deploy start --manifest "${{ env.PACKAGE_FILE_NAME }}" -w 60 ${{ env.SFDX_RUN_TEST_LEVEL }} $FINAL_DESTRUCTIVE_PRE_DEPLOY $FINAL_DESTRUCTIVE_POS_DEPLOY

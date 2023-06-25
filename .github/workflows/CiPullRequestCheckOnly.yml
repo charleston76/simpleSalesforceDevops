@@ -73,8 +73,8 @@ jobs:
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
       - name: Install sfdx CLI
         run: npm install sfdx-cli --global
-      - name: Check CLI the version
-        run: sfdx -v
+      # - name: Check CLI the version
+      #   run: sfdx -v
       - name: Installing xml2js
         run: npm install xml2js
       - name: Reading package test classes

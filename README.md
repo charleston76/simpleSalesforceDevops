@@ -114,8 +114,9 @@ With this name convention, behind the scenes we have a [node.js file](/scripts/j
 
 Examples in the repository:
 * AccountController;
+* AccountControllerTest;
 * AccountHelper;
-* AccountControllerTest (that will coverage both of them);
+* AccountHelperTest;
 
 In the ideal scenario on the perfect world, all classes will get 100% of coverage with your hard work!
 
@@ -150,9 +151,10 @@ In that file, you'll specify the test classes to achieve the necessary coverage:
 
 ![Specific test class name](images/SpecificTestClasses.png)
 
-With that defined
-[How the magic will happen](#how-the-magic-will-happen)
-1 - Test coverage based on name convention
+With that said, all other things will follow almost the same dynamics explained above at [1 - Test coverage based on name convention](#1---test-coverage-based-on-name-convention), but this time , behind the scenes we have [another node.js file](/scripts/js/readNamedApexTestClass.js) that will read the package (1) looking for apex classes, and if any classes exists, will check for the test class file (2), to find out the tests to execute (3).
+
+![Checked Process](images/checkedProcess.png)
+
 
 
 ## Don't have apex classes involved?

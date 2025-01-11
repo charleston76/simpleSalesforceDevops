@@ -1,0 +1,10 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+    <lightning:listView aura:id="listViewInscricao"
+    objectApiName="Inscricao__c"
+    listName="All"
+    rows="5"
+    showSearchBar="true"
+    showActionBar="false"
+    enableInlineEdit="false"
+    showRowLevelActions="false" />
+</aura:component>

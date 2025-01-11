@@ -1,5 +1,5 @@
 @isTest
-public class AccountHelperTest {
+public with sharing class NameDoesntMatter {
     @testSetup static void setup() {
         // Create the accout to get
         Account newAcc = new Account (

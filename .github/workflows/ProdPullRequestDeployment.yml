@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '20'
       - name: Checking the branch and the package file
         run: |
           fullName=${{github.head_ref}}
@@ -41,7 +41,11 @@ jobs:
           echo "Final branch name" $finalBranchName
 
           packageFileName="manifest/package-$finalBranchName.xml"
-          echo "package File Name $packageFileName"
+          # packageTest-[Ticket or branch name].xml
+          packageTestFileName="manifest/packageTest-$finalBranchName.xml"
+          echo "Package file name $packageFileName"
+          echo "Test package file name $packageTestFileName"
+
           echo "Checking if the package exists"
           if [[ -f $packageFileName  ]]; then
             echo "The package file exist, continuing the process!"
@@ -71,18 +75,30 @@ jobs:
           echo "DESTRUCTIVE_PRE_DEPLOY=$DESTRUCTIVE_PRE_DEPLOY" >> $GITHUB_ENV;
           echo "DESTRUCTIVE_POS_DEPLOY=$DESTRUCTIVE_POS_DEPLOY" >> $GITHUB_ENV;
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
-      - name: Install sfdx CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
-          mkdir sfdx
-          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
-          echo "sfdx/bin" >> $GITHUB_PATH
+          echo "TEST_PACKAGE_FILE_NAME=$packageTestFileName" >> $GITHUB_ENV;
+
       - name: Installing xml2js
         run: npm install xml2js
+  
       - name: Reading package test classes
         run: |
-          SFDX_SPECIFIC_TEST_FOUND=$(node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}");
-          echo "SFDX_SPECIFIC_TEST_FOUND=$SFDX_SPECIFIC_TEST_FOUND" >> $GITHUB_ENV;
+          node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}" "${{ env.TEST_PACKAGE_FILE_NAME }}"
+      - name: Check if process should continue
+        run: |
+          if [ "${{ env.CONTINUE_PROCESS }}" == "Is missing" ]
+          then
+            echo "Process needs to stop due to missing test package file ${{ env.TEST_PACKAGE_FILE_NAME }}."
+            echo "The possibilities are:"
+            echo "1 - You don't have created the ${{ env.TEST_PACKAGE_FILE_NAME }} file"
+            echo "2 - You don't have the test classes at the classes folder"
+            echo "3 - The content in the ${{ env.TEST_PACKAGE_FILE_NAME }} is not really test class"
+            exit 1
+          fi
+
+          echo "Test package file ${{ env.TEST_PACKAGE_FILE_NAME }} ${{ env.CONTINUE_PROCESS }}."
+
+          echo "The tests that were found ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
+
       - name: Defining the test command
         run: |
           if [ -z "${{ env.SFDX_SPECIFIC_TEST_FOUND }}" ]
@@ -90,12 +106,20 @@ jobs:
             echo "There is no test classes"
             SFDX_RUN_TEST_LEVEL="-l NoTestRun"
           else
-            SFDX_RUN_TEST_LEVEL="-l RunSpecifiedTests -t ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
+            SFDX_RUN_TEST_LEVEL="-l RunSpecifiedTests --tests ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
           fi
           echo "SFDX_RUN_TEST_LEVEL=$SFDX_RUN_TEST_LEVEL" >> $GITHUB_ENV;
       - name: Printing specific test classes found
         run: |
           echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
+
+      - name: Install sfdx CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
+          mkdir sfdx
+          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
+          echo "sfdx/bin" >> $GITHUB_PATH
+
       - name: Login in the environment
         env:
           DEPLOYMENT_USER: ${{ secrets.PROD_USER_ADMIN }}
@@ -103,6 +127,7 @@ jobs:
           INSTANCE_URL: ${{ secrets.PROD_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
         run: |
+          mkdir -p JWT
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
           sf org login jwt --client-id $CONSUMER_KEY --jwt-key-file JWT/connectionFile --username $DEPLOYMENT_USER --set-default --instance-url $INSTANCE_URL --alias DeploymetOrg
           rm -rf JWT

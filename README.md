@@ -59,10 +59,10 @@ Of course that will really work if you have some [branch protection rules](https
 
 But its is something up to you, because actually all shown here need to be adequate to follow your needs.
 <br/><br/>
-## Destructive changes? Yes, we do that here!
+
+<!-- ## Destructive changes? Yes, we do that here!
 <br/>
 
-<!-- ![Destructive changes](images/destructiveFinal3.png) -->
 <img src="images/destructiveFinal3.png" width="30%" height="30%" alt="Destructive changes" />
 
 The destructive process just follow the same strategy created before: “Naming convention“.
@@ -80,11 +80,11 @@ This will be the deployment order, case one or both files exists:
 1. manifest/package-BRANCH_NAME.xml - Deploying and validating the apex classes;
 1. manifestDestructive/packagePos-BRANCH_NAME.xml - Removing the things after the deployment;
 
-Very simple, and behind the scenes, the git action just will do the sfdx commands below:
+Very simple, and behind the scenes, the git action just will do the sf CLI commands below:
 
     ```
-    sfdx force:mdapi:deploy -u [ORG_ALIAS] -d manifestDestructive -g -w -1
-    ```
+    sf project deploy start -w 60 --pre-destructive-changes manifestDestructive/packagePre.xml --post-destructive-changes manifestDestructive/packagePos.xml
+    ``` -->
 
 
 ## How to achieve the apex classes coverage?
@@ -93,9 +93,18 @@ No miracles here my friend, everybody knows that coverage is not necessary to de
 
 ![Coverage Issue](images/coverageIssue.png)
 
+Lucky for you, we now have two ways to make this coverage happens.
+
+1. The first one that already explained before, throughout the name convention;
+1. The second one, based in whatever name your test classes could have with test specification file;
+
+So let's breakdown those possibilities...
+
+### 1 - Test coverage based on name convention
+
 In this example we are expecting that your apex classes also follows the name convention below:
-* ApexClasName
-* ApexClasNameTest
+* ApexClassName
+* ApexClassNameTest
 
 With this name convention, behind the scenes we have a [node.js file](/scripts/js/readApexTestClass.js) that will read the package looking for apex classes, and for each ones found will:
 1. Get its names;
@@ -115,7 +124,36 @@ Yep, I know, but not today...
 ![Coverage done](images/coveredDone.png)
 
 
-We also have another way to do that, using a "test specification file", and as the name says, you specify what test classes would run to achieve the coverage, but we'll talk about that in a future version...
+We also have another way to do that, using a "test specification file", and as the name says, you specify what test classes would run to achieve the coverage, but we'll talk about that in the next topic...
+
+
+### 2 - Test specification file
+
+Over again: As the name says, you specify what test classes would run to achieve the coverage.
+
+But, how that will exactly works?
+
+Let's suppose that in the real world, your apex classes doesn't follow a name convention, or due to another reason, you can not just implement the previous approach.
+For instance, your "ApexClasName" have variations due to different implementations along the years:
+* ApexTestClassName
+* TestApexClassName
+* TesteClass
+* AnotherWeirdName
+
+In this scenario, you will use the name convention explained at the [How the magic will happen](#how-the-magic-will-happen) section, and add the new specific file with this format:
+
+* packageTest-[TICKET].xml;
+* For example: packageTest-DEV-012.xml;
+* ![Package Test Name](images/packageTestName.png)
+
+In that file, you'll specify the test classes to achieve the necessary coverage:
+
+![Specific test class name](images/SpecificTestClasses.png)
+
+With that defined
+[How the magic will happen](#how-the-magic-will-happen)
+1 - Test coverage based on name convention
+
 
 ## Don't have apex classes involved?
 

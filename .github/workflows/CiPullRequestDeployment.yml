@@ -159,7 +159,7 @@ jobs:
 
             destructivePosFileName="Deploy/destructiveChangesPost.xml"
             cp "${{ env.DESTRUCTIVE_POS_DEPLOY }}" "$destructivePosFileName"
-            FINAL_DESTRUCTIVE_POS_DEPLOY="--pre-destructive-changes $destructivePosFileName"
+            FINAL_DESTRUCTIVE_POS_DEPLOY="--post-destructive-changes $destructivePosFileName"
           fi
           echo "FINAL_DESTRUCTIVE_POS_DEPLOY = $FINAL_DESTRUCTIVE_POS_DEPLOY"
 

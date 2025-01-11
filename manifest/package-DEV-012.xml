@@ -4,7 +4,7 @@
         <members>AuraListView</members>
         <name>AuraDefinitionBundle</name>
     </types>
-    <!-- types>
+    <types>
         <members>AccountController</members>
         <members>AccountControllerTest</members>
         <members>AccountHelper</members>
@@ -12,6 +12,6 @@
         <members>NameDoesntMatter</members>
         <members>TestAccountController</members>
         <name>ApexClass</name>
-    </types -->
+    </types>
     <version>62.0</version>
 </Package>

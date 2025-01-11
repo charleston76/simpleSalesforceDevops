@@ -81,7 +81,7 @@ jobs:
         run: npm install xml2js
       - name: Reading package test classes
         run: |
-          SFDX_SPECIFIC_TEST_FOUND=$(node ./scripts/js/readApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}");
+          SFDX_SPECIFIC_TEST_FOUND=$(node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}");
           echo "SFDX_SPECIFIC_TEST_FOUND=$SFDX_SPECIFIC_TEST_FOUND" >> $GITHUB_ENV;
       - name: Defining the test command
         run: |

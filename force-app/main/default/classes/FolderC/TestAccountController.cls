@@ -1,5 +1,5 @@
 @isTest
-public class AccountHelperTest {
+public class TestAccountController {
     @testSetup static void setup() {
         // Create the accout to get
         Account newAcc = new Account (
@@ -15,9 +15,10 @@ public class AccountHelperTest {
         };
 
         Test.startTest();
-        List<Account> lstAccount = AccountHelper.getInstance().getAccountList(accountIds );
+        List<Account> lstAccount = AccountController.getAccountList(accountIds );
         Test.stopTest();
         
         System.assertNotEquals(lstAccount.size(),0);
     }
 }
+

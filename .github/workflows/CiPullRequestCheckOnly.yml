@@ -85,7 +85,7 @@ jobs:
           npm install -g @salesforce/cli@latest
           sf --version          
       - name: Installing xml2js
-        run: npm install xml2js
+        run: npm install xml2js --legacy-peer-deps
       - name: Reading package test classes
         run: |
           node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}" "${{ env.TEST_PACKAGE_FILE_NAME }}"

@@ -78,7 +78,7 @@ jobs:
           echo "TEST_PACKAGE_FILE_NAME=$packageTestFileName" >> $GITHUB_ENV;
 
       - name: Installing xml2js
-        run: npm install xml2js
+        run: npm install xml2js --legacy-peer-deps
   
       - name: Reading package test classes
         run: |

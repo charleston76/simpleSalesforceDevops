@@ -76,10 +76,16 @@ jobs:
           echo "DESTRUCTIVE_POS_DEPLOY=$DESTRUCTIVE_POS_DEPLOY" >> $GITHUB_ENV;
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
           echo "TEST_PACKAGE_FILE_NAME=$packageTestFileName" >> $GITHUB_ENV;
-
+      - name: Install sfdx CLI
+        run: |
+          # wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
+          # mkdir sfdx
+          # tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
+          # echo "sfdx/bin" >> $GITHUB_PATH
+          npm install -g @salesforce/cli@latest
+          sf --version          
       - name: Installing xml2js
-        run: npm install xml2js
-  
+        run: npm install xml2js --legacy-peer-deps
       - name: Reading package test classes
         run: |
           node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}" "${{ env.TEST_PACKAGE_FILE_NAME }}"
@@ -98,7 +104,6 @@ jobs:
           echo "Test package file ${{ env.TEST_PACKAGE_FILE_NAME }} ${{ env.CONTINUE_PROCESS }}."
 
           echo "The tests that were found ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
-
       - name: Defining the test command
         run: |
           if [ -z "${{ env.SFDX_SPECIFIC_TEST_FOUND }}" ]
@@ -112,20 +117,13 @@ jobs:
       - name: Printing specific test classes found
         run: |
           echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
-
-      - name: Install sfdx CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
-          mkdir sfdx
-          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
-          echo "sfdx/bin" >> $GITHUB_PATH
-
       - name: Login in the environment
         env:
           DEPLOYMENT_USER: ${{ secrets.UAT_USER_ADMIN }}
           CONSUMER_KEY: ${{ secrets.UAT_CONSUMER_KEY }}
           INSTANCE_URL: ${{ secrets.UAT_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
+          NEXT_DEPLOYABLE_BRANCH: ${{ secrets.PROD_BRANCH }}
         run: |
           mkdir -p JWT
           echo "$SERVER_KEY_CERTIFICATE" > ./JWT/connectionFile
@@ -164,3 +162,18 @@ jobs:
           echo "FINAL_DESTRUCTIVE_POS_DEPLOY = $FINAL_DESTRUCTIVE_POS_DEPLOY"
 
           sf project deploy start --manifest "${{ env.PACKAGE_FILE_NAME }}" -w 60 ${{ env.SFDX_RUN_TEST_LEVEL }} $FINAL_DESTRUCTIVE_PRE_DEPLOY $FINAL_DESTRUCTIVE_POS_DEPLOY
+
+      - name: Creating Pull Request to Next Branch
+        if: success() && github.event.pull_request.merged == true
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { createNextPullRequest } = require('./scripts/js/createNextPullRequest.js');
+            
+            const sourceBranch = context.payload.pull_request.head.ref;
+            const nextBranch = process.env.NEXT_DEPLOYABLE_BRANCH;
+            const originalTitle = context.payload.pull_request.title;
+            
+            await createNextPullRequest(github, context, sourceBranch, nextBranch, originalTitle);
+        env:
+          NEXT_DEPLOYABLE_BRANCH: ${{ secrets.PROD_BRANCH }}          

@@ -76,10 +76,16 @@ jobs:
           echo "DESTRUCTIVE_POS_DEPLOY=$DESTRUCTIVE_POS_DEPLOY" >> $GITHUB_ENV;
           echo "PACKAGE_FILE_NAME=$packageFileName" >> $GITHUB_ENV;
           echo "TEST_PACKAGE_FILE_NAME=$packageTestFileName" >> $GITHUB_ENV;
-
+      - name: Install sfdx CLI
+        run: |
+          # wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
+          # mkdir sfdx
+          # tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
+          # echo "sfdx/bin" >> $GITHUB_PATH
+          npm install -g @salesforce/cli@latest
+          sf --version          
       - name: Installing xml2js
-        run: npm install xml2js
-  
+        run: npm install xml2js --legacy-peer-deps
       - name: Reading package test classes
         run: |
           node ./scripts/js/readNamedApexTestClass.js "${{ env.PACKAGE_FILE_NAME }}" "${{ env.TEST_PACKAGE_FILE_NAME }}"
@@ -98,7 +104,6 @@ jobs:
           echo "Test package file ${{ env.TEST_PACKAGE_FILE_NAME }} ${{ env.CONTINUE_PROCESS }}."
 
           echo "The tests that were found ${{ env.SFDX_SPECIFIC_TEST_FOUND }}"
-
       - name: Defining the test command
         run: |
           if [ -z "${{ env.SFDX_SPECIFIC_TEST_FOUND }}" ]
@@ -112,14 +117,6 @@ jobs:
       - name: Printing specific test classes found
         run: |
           echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
-
-      - name: Install sfdx CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
-          mkdir sfdx
-          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
-          echo "sfdx/bin" >> $GITHUB_PATH
-
       - name: Login in the environment
         env:
           DEPLOYMENT_USER: ${{ secrets.UAT_USER_ADMIN }}

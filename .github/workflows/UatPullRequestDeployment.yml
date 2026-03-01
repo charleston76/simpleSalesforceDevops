@@ -119,9 +119,9 @@ jobs:
           echo "Specific test classes to run: ${{ env.SFDX_RUN_TEST_LEVEL }}"
       - name: Login in the environment
         env:
-          DEPLOYMENT_USER: ${{ secrets.CI_USER_ADMIN }}
-          CONSUMER_KEY: ${{ secrets.CI_CONSUMER_KEY }}
-          INSTANCE_URL: ${{ secrets.CI_SANDBOX_INSTANCE_URL }}
+          DEPLOYMENT_USER: ${{ secrets.UAT_USER_ADMIN }}
+          CONSUMER_KEY: ${{ secrets.UAT_CONSUMER_KEY }}
+          INSTANCE_URL: ${{ secrets.UAT_SANDBOX_INSTANCE_URL }}
           SERVER_KEY_CERTIFICATE: ${{ secrets.SERVER_KEY_CERTIFICATE }}
           NEXT_DEPLOYABLE_BRANCH: ${{ secrets.PROD_BRANCH }}
         run: |

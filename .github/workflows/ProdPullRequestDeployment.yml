@@ -115,11 +115,12 @@ jobs:
 
       - name: Install sfdx CLI
         run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
-          mkdir sfdx
-          tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
-          echo "sfdx/bin" >> $GITHUB_PATH
-
+          # wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz -q
+          # mkdir sfdx
+          # tar xJf sfdx-linux-x64.tar.xz -C sfdx --strip-components 1
+          # echo "sfdx/bin" >> $GITHUB_PATH
+          npm install -g @salesforce/cli@latest
+          sf --version
       - name: Login in the environment
         env:
           DEPLOYMENT_USER: ${{ secrets.PROD_USER_ADMIN }}
